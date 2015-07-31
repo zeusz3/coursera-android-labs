@@ -1,6 +1,7 @@
 package course.labs.fragmentslab;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,10 +27,15 @@ public class MainActivity extends Activity implements
 			mFriendsFragment = new FriendsFragment();
 
 			//TODO 1 - add the FriendsFragment to the fragment_container
-			
-			
-			
-
+			//mFriendsFragment = (FriendsFragment) getFragmentManager().findFragmentById(R.id.fragment_container);
+			//fragment manager
+			//begin fragment transaction
+			//add the fragment
+			//commit the fragment transaction
+			FragmentManager friendsFragManager = getFragmentManager();
+			FragmentTransaction friendsFragTransaction = friendsFragManager.beginTransaction();
+			friendsFragTransaction.add(R.id.fragment_container, mFriendsFragment);
+			friendsFragTransaction.commit();
 		} else {
 
 			// Otherwise, save a reference to the FeedFragment for later use
@@ -65,7 +71,10 @@ public class MainActivity extends Activity implements
 		if (!isInTwoPaneMode()) {
 
 			//TODO 2 - replace the fragment_container with the FeedFragment
-			
+			FragmentManager feedFragManager = getFragmentManager();
+			FragmentTransaction feedFragTransaction = feedFragManager.beginTransaction();
+			feedFragTransaction.add(R.id.fragment_container, mFeedFragment);
+			feedFragTransaction.commit();
 
 			
 
