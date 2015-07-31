@@ -12,7 +12,7 @@ public class GoToDangerousActivity extends Activity {
 	
 	private static final String TAG = "Lab-Permissions";
 
-	private static final String DANGEROUS_ACTIVITY_ACTION = "course.labs.permissions.DANGEROUS_ACTIVITY";
+	private static final String DANGEROUS_ACTIVITY_ACTION = "course.labs.persmissions.DANGEROUS_ACTIVITY";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +37,7 @@ public class GoToDangerousActivity extends Activity {
 		Log.i(TAG, "Entered startDangerousActivity()");
 
 		startActivity(new Intent(DANGEROUS_ACTIVITY_ACTION));
-		
+		Log.i(TAG, "Exited startDangerousActivity()");
 
 	}
 
