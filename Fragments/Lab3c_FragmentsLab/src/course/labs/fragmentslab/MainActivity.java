@@ -14,6 +14,8 @@ public class MainActivity extends Activity implements
 	private FriendsFragment mFriendsFragment;
 	private FeedFragment mFeedFragment;
 
+	private FragmentManager mfragmentManager;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -27,15 +29,12 @@ public class MainActivity extends Activity implements
 			mFriendsFragment = new FriendsFragment();
 
 			//TODO 1 - add the FriendsFragment to the fragment_container
-			//mFriendsFragment = (FriendsFragment) getFragmentManager().findFragmentById(R.id.fragment_container);
-			//fragment manager
-			//begin fragment transaction
-			//add the fragment
-			//commit the fragment transaction
-			FragmentManager friendsFragManager = getFragmentManager();
-			FragmentTransaction friendsFragTransaction = friendsFragManager.beginTransaction();
+			mfragmentManager = getFragmentManager();
+			FragmentTransaction friendsFragTransaction = mfragmentManager.beginTransaction();
 			friendsFragTransaction.add(R.id.fragment_container, mFriendsFragment);
+			friendsFragTransaction.addToBackStack(null);
 			friendsFragTransaction.commit();
+			
 		} else {
 
 			// Otherwise, save a reference to the FeedFragment for later use
@@ -69,16 +68,13 @@ public class MainActivity extends Activity implements
 		// If in single-pane mode, replace single visible Fragment
 
 		if (!isInTwoPaneMode()) {
-
 			//TODO 2 - replace the fragment_container with the FeedFragment
 			FragmentManager feedFragManager = getFragmentManager();
 			FragmentTransaction feedFragTransaction = feedFragManager.beginTransaction();
+			feedFragTransaction.remove(mFriendsFragment);
 			feedFragTransaction.add(R.id.fragment_container, mFeedFragment);
+			feedFragTransaction.addToBackStack(null);
 			feedFragTransaction.commit();
-
-			
-
-			// execute transaction now
 			getFragmentManager().executePendingTransactions();
 
 		}
