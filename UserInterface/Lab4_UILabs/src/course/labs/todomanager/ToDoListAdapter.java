@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.content.Context;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -84,24 +85,28 @@ public class ToDoListAdapter extends BaseAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 
 		// TODO - Get the current ToDoItem
-		final ToDoItem toDoItem = null;
-
-
+		final ToDoItem toDoItem = (ToDoItem)getItem(position);
+		LayoutInflater li = null;
+		RelativeLayout itemLayout = null;
+		myViewHolder holder = new myViewHolder();
+		
 		// TODO - Inflate the View for this ToDoItem
 		// from todo_item.xml
-		RelativeLayout itemLayout = null;
-
+		if (convertView == null) {
+			li = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			itemLayout = (RelativeLayout) li.inflate(R.layout.todo_item, null);
+		}
 		// Fill in specific ToDoItem data
 		// Remember that the data that goes in this View
 		// corresponds to the user interface elements defined
 		// in the layout file
 
 		// TODO - Display Title in TextView
-		final TextView titleView = null;
+		final TextView titleView = (TextView) convertView.findViewById(R.id.titleView);
 
 
 		// TODO - Set up Status CheckBox
-		final CheckBox statusView = null;
+		final CheckBox statusView = (CheckBox) convertView.findViewById(R.id.statusCheckBox);
 
 
 		// TODO - Must also set up an OnCheckedChangeListener,
@@ -121,7 +126,7 @@ public class ToDoListAdapter extends BaseAdapter {
 				});
 
 		// TODO - Display Priority in a TextView
-		final TextView priorityView = null;
+		final TextView priorityView = (TextView) convertView.findViewById(R.id.priorityView);
 
 
 
@@ -134,4 +139,10 @@ public class ToDoListAdapter extends BaseAdapter {
 		return itemLayout;
 
 	}
+}
+class myViewHolder {
+	TextView titleView;
+	CheckBox statusView;
+	TextView priorityView;
+	TextView dateView;
 }
