@@ -109,7 +109,7 @@ public class AddToDoActivity extends Activity {
 
 				// TODO - Reset data to default values
 
-
+				setContentView(R.layout.add_todo);
                 
                 
                 
@@ -131,29 +131,30 @@ public class AddToDoActivity extends Activity {
 
 
 				// TODO - Get the current Priority
-				Priority priority = null;
-				if (((RadioButton)findViewById(mPriorityRadioGroup.getCheckedRadioButtonId())).getText().toString() == "Low") {
+				Priority priority = getPriority();
+				/*if (((RadioButton)findViewById(mPriorityRadioGroup.getCheckedRadioButtonId())).getText().toString() == "Low") {
 					priority = ToDoItem.Priority.LOW;
 				} else if (((RadioButton)findViewById(mPriorityRadioGroup.getCheckedRadioButtonId())).getText().toString() == "Medium" ) {
 					priority = ToDoItem.Priority.MED;
 				} else {
 					priority = ToDoItem.Priority.HIGH;
-				}
+				}*/
 				Log.i(TAG, ((RadioButton)findViewById(mPriorityRadioGroup.getCheckedRadioButtonId())).getText().toString());
 					
 
 				// TODO - Get the current Status
-				Status status = null;
-				if (((RadioButton)findViewById(mStatusRadioGroup.getCheckedRadioButtonId())).getText().toString() == "Not Done" ) {
+				Status status = getStatus();
+				/*if (((RadioButton)findViewById(mStatusRadioGroup.getCheckedRadioButtonId())).getText().toString() == "Not Done" ) {
 					status = ToDoItem.Status.NOTDONE;
 				} else {
 					status = ToDoItem.Status.DONE;;
-				}
+				}*/
 
 				// TODO - Get the current ToDoItem Title
 
 
-				String titleString = mTitleText.getText().toString();
+				String titleString = getToDoTitle(); 
+						//mTitleText.getText().toString();
 
 
 				// Construct the Date string
