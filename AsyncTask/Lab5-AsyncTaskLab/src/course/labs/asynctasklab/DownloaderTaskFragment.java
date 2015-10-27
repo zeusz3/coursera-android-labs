@@ -34,13 +34,8 @@ public class DownloaderTaskFragment extends Fragment {
 		// TODO: Retrieve arguments from DownloaderTaskFragment
 		// Prepare them for use with DownloaderTask. 
 		Bundle args = getArguments();
-		
 		ArrayList<Integer> friends = args.getIntegerArrayList("friends");
-		Log.v(TAG, String.valueOf(friends.get(0)));
 		Integer[] intg = friends.toArray(new Integer[friends.size()]);
-        for(int i = 0; i < intg.length; i++) {
-            Log.v(TAG, String.valueOf(intg[i]));
-        }
 
 		// TODO: Start the DownloaderTask 
 		dt.execute(intg);
