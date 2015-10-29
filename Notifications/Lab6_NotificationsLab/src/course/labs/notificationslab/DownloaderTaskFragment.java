@@ -100,8 +100,6 @@ public class DownloaderTaskFragment extends Fragment {
 		// TODO: Uncomment this helper method
 		// Simulates downloading Twitter data from the network
 
- 
-	 
 		 private String[] downloadTweets(Integer resourceIDS[]) {
 	 
 			final int simulatedDelay = 2000;
@@ -188,13 +186,14 @@ public class DownloaderTaskFragment extends Fragment {
 
 							// TODO: Check whether or not the MainActivity
 							// received the broadcast
-
-							if (true || false) {
+							//if(MainActivity.IS_ALIVE == 1) {
+							if (getResultData() == String.valueOf(MainActivity.IS_ALIVE)) {
 
 								// TODO: If not, create a PendingIntent using
 								// the
 								// restartMainActivityIntent and set its flags
 								// to FLAG_UPDATE_CURRENT
+								PendingIntent pIntent = PendingIntent.getActivity(mContext, 0, restartMainActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 
 
@@ -214,7 +213,7 @@ public class DownloaderTaskFragment extends Fragment {
 								// TODO: Set the notification View's text to
 								// reflect whether the download completed
 								// successfully
-
+								mContentView.setTextViewText(MY_NOTIFICATION_ID, (CharSequence)successMsg);
 
 
 
@@ -224,11 +223,19 @@ public class DownloaderTaskFragment extends Fragment {
 								// android.R.drawable.stat_sys_warning
 								// for the small icon. You should also
 								// setAutoCancel(true).
+								Log.i("TICKER", successMsg);
 
-								Notification.Builder notificationBuilder = null;
+								Notification.Builder notificationBuilder = new Notification.Builder(
+										mContext)
+								.setTicker(successMsg)
+								.setSmallIcon(android.R.drawable.stat_sys_warning)
+								.setAutoCancel(true)
+								.setContentIntent(pIntent)
+								.setContent(mContentView);
 
 								// TODO: Send the notification
-
+								NotificationManager mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+								mNotificationManager.notify(MY_NOTIFICATION_ID, notificationBuilder.build());
 
 
 
