@@ -5,7 +5,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -16,6 +15,7 @@ import android.media.AudioManager;
 import android.media.SoundPool;
 import android.media.SoundPool.OnLoadCompleteListener;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Menu;
@@ -140,7 +140,12 @@ public class BubbleActivity extends Activity {
 				// TODO - Implement onFling actions.
 				// You can get all Views in mFrame using the
 				// ViewGroup.getChildCount() method
-				
+				for(int i = 0; i < mFrame.getChildCount(); i++) {
+					BubbleView bv = (BubbleView) mFrame.getChildAt(i);
+					if(bv.intersects(event.getX(), event.getY())) {
+						
+					}
+				}
 				return false;
 
 			}
@@ -151,32 +156,28 @@ public class BubbleActivity extends Activity {
 
 			@Override
 			public boolean onSingleTapConfirmed(MotionEvent event) {
-				Log.i("onSingleTapConfirmed", "confirmed");
 				// TODO - Implement onSingleTapConfirmed actions.
 				// You can get all Views in mFrame using the
 				// ViewGroup.getChildCount() method
 				int noOfChilds = mFrame.getChildCount();
 				if(noOfChilds > 0) {
-					for(int i = 1; i < mFrame.getChildCount(); i++) {
-						
+					boolean popped = false;
+					for(int i = 0; i < noOfChilds; i++) {
 						BubbleView bv = (BubbleView) mFrame.getChildAt(i);
-						int bvY = bv.getTop();
-						int bvX = bv.getLeft();
-						Log.i("eventX - eventY", String.valueOf(event.getX()) + String.valueOf(event.getY()));
-						if (event.getX() >= bvX && event.getX() < bv.getRight() && event.getY() >= bvY && event.getY() < bv.getBottom()) {
-							Log.i("X-Y", String.valueOf(bvX) + String.valueOf(bvY));
-							Log.i("bvX-bvY", String.valueOf(bv.getX()) + String.valueOf(bv.getY()));
-						} else {
-							BubbleView nbv = new BubbleView(getApplicationContext(), event.getX(), event.getY());
-							mFrame.addView(nbv);
+						if(bv.intersects(event.getX(), event.getY())) {
+							mFrame.removeViewAt(i);
+							popped = true;
 						}
-						
 					}
+					if(!popped) {
+						BubbleView nbv = new BubbleView(getApplicationContext(), event.getX(), event.getY());
+						mFrame.addView(nbv);
+					}
+							
 				} else {
 					BubbleView nbv = new BubbleView(getApplicationContext(), event.getX(), event.getY());
 					mFrame.addView(nbv);
 				}
-
 
 				
 				
@@ -228,9 +229,21 @@ public class BubbleActivity extends Activity {
 		// location, speed and direction of the bubble
 		private float mXPos, mYPos, mDx, mDy, mRadius, mRadiusSquared;
 		private long mRotate, mDRotate;
+		private int mBitmapWidthAndHeight;
+		private int mBitmapWidthAndHeightAdj;
+		private DisplayMetrics mDisplayMetrics;
 
 		BubbleView(Context context, float x, float y) {
 			super(context);
+			
+			/*mBitmapWidthAndHeight = mScaledBitmapWidth;
+			mBitmapWidthAndHeightAdj = mBitmapWidthAndHeight + 20;
+			
+			mDisplayMetrics = new DisplayMetrics();
+			BubbleActivity.this.getWindowManager().getDefaultDisplay()
+					.getMetrics(mDisplayMetrics);
+			mDisplayWidth = mDisplayMetrics.widthPixels;
+			mDisplayHeight = mDisplayMetrics.heightPixels;*/
 
 			// Create a new random number generator to
 			// randomize size, rotation, speed and direction
@@ -291,6 +304,7 @@ public class BubbleActivity extends Activity {
 				// Limit movement speed in the x and y
 				// direction to [-3..3] pixels per movement.
 				mDx = 6 * r.nextFloat() - 3; 
+				mDy = 6 * r.nextFloat() - 3;
 			}
 		}
 
@@ -308,7 +322,7 @@ public class BubbleActivity extends Activity {
 			// TODO - create the scaled bitmap using size set above
 			
 			mScaledBitmap = Bitmap.createScaledBitmap(mBitmap, mScaledBitmapWidth, mScaledBitmapWidth, false);
-			Log.i("scaled created", "scaled");
+			Log.i(TAG, "scaled");
 		}
 
 		// Start moving the BubbleView & updating the display
@@ -330,6 +344,8 @@ public class BubbleActivity extends Activity {
 					// move one step. If the BubbleView exits the display, 
 					// stop the BubbleView's Worker Thread. 
 					// Otherwise, request that the BubbleView be redrawn. 
+					moveWhileOnScreen();
+					Log.i(TAG, "scheduler");
 					
 				}
 			}, 0, REFRESH_RATE, TimeUnit.MILLISECONDS);
@@ -337,16 +353,11 @@ public class BubbleActivity extends Activity {
 
 		// Returns true if the BubbleView intersects position (x,y)
 		private synchronized boolean intersects(float x, float y) {
-
+			
 			// TODO - Return true if the BubbleView intersects position (x,y)
-
-
-
-
-			
-			
-			
-		    return false;
+			if ((x-mXPos)*(x-mXPos)+(y-mYPos)*(y-mYPos) <= mRadiusSquared)
+				return true;
+			else return false;
 		}
 
 		// Cancel the Bubble's movement
@@ -365,7 +376,7 @@ public class BubbleActivity extends Activity {
 				public void run() {
 
 					// TODO - Remove the BubbleView from mFrame
-	
+					
 					
 					// TODO - If the bubble was popped by user,
 					// play the popping sound
@@ -383,12 +394,8 @@ public class BubbleActivity extends Activity {
 		private synchronized void deflect(float velocityX, float velocityY) {
 
 			//TODO - set mDx and mDy to be the new velocities divided by the REFRESH_RATE
-			
-
-
-
-
-
+			mDx = velocityX;
+			mDy = velocityY;
 		}
 
 		// Draw the Bubble at its current location
@@ -426,9 +433,10 @@ public class BubbleActivity extends Activity {
 		private synchronized boolean moveWhileOnScreen() {
 
 			// TODO - Move the BubbleView
-
-
-			return false;
+			mXPos += mDx;
+			mYPos += mDy;
+			Log.i(TAG, "moved");
+			return !isOutOfView();
 		}
 
 		// Return true if the BubbleView is off the screen after the move
@@ -437,9 +445,13 @@ public class BubbleActivity extends Activity {
 
 			// TODO - Return true if the BubbleView is off the screen after
 			// the move operation
-
-
-			return false;
+			if(mXPos+mRadius+mRadius < 0 && mYPos+mRadius+mRadius < 0) {
+				Log.i(TAG, "is out");
+				return true;
+				
+			}
+				
+			else return false;
 		}
 	}
 
