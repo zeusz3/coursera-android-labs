@@ -1,5 +1,7 @@
 package course.labs.locationlab;
 
+import java.util.List;
+
 import android.app.ListActivity;
 import android.content.Context;
 import android.location.Location;
@@ -13,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class PlaceViewActivity extends ListActivity implements LocationListener {
@@ -49,7 +52,8 @@ public class PlaceViewActivity extends ListActivity implements LocationListener 
 		// TODO - add a footerView to the ListView
 		// You can use footer_view.xml to define the footer
 
-        View footerView = null;
+        final View footerView = (TextView) getLayoutInflater().inflate(R.layout.footer_view, null);
+        footerView.setEnabled(null !=mLastLocationReading);
 
 		// TODO - footerView must respond to user clicks, handling 3 cases:
 
@@ -71,24 +75,17 @@ public class PlaceViewActivity extends ListActivity implements LocationListener 
 
 			@Override
 			public void onClick(View arg0) {
-
-
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
+				mLastLocationReading = bestLastKnownLocation(mMinDistance, mMinTime);
+				if (null == mLastLocationReading) {
+					footerView.setEnabled(false);
+				} else {
+					if (!mAdapter.intersects(mLastLocationReading)) {
+						PlaceDownloaderTask placeDownloaderTask = new PlaceDownloaderTask(PlaceViewActivity.this, false);
+						placeDownloaderTask.execute(mLastLocationReading);
+					} else {
+						Toast.makeText(getApplicationContext(), "You already have this location badge", Toast.LENGTH_LONG).show();
+					}
+				}
 			}
 
 		});
@@ -97,6 +94,42 @@ public class PlaceViewActivity extends ListActivity implements LocationListener 
 		mAdapter = new PlaceViewAdapter(getApplicationContext());
 		setListAdapter(mAdapter);
 
+	}
+	
+	private Location bestLastKnownLocation(float minAccuracy, long maxAge) {
+
+		Location bestResult = null;
+		float bestAccuracy = Float.MAX_VALUE;
+		long bestAge = Long.MIN_VALUE;
+
+		List<String> matchingProviders = mLocationManager.getAllProviders();
+
+		for (String provider : matchingProviders) {
+
+			Location location = mLocationManager.getLastKnownLocation(provider);
+
+			if (location != null) {
+
+				float accuracy = location.getAccuracy();
+				long time = location.getTime();
+
+				if (accuracy < bestAccuracy) {
+
+					bestResult = location;
+					bestAccuracy = accuracy;
+					bestAge = time;
+
+				}
+			}
+		}
+
+		// Return best reading or null
+		if (bestAccuracy > minAccuracy
+				|| (System.currentTimeMillis() - bestAge) > maxAge) {
+			return null;
+		} else {
+			return bestResult;
+		}
 	}
 
 	@Override
@@ -107,17 +140,10 @@ public class PlaceViewActivity extends ListActivity implements LocationListener 
 
 		// TODO - Check NETWORK_PROVIDER for an existing location reading.
 		// Only keep this last reading if it is fresh - less than 5 minutes old
-
-
-        
-        
-        mLastLocationReading = null;
-
-
+		mLastLocationReading = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+		
 		// TODO - register to receive location updates from NETWORK_PROVIDER
-
-
-        
+		mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, mMinTime, mMinDistance, this);
         
 	}
 
@@ -125,8 +151,7 @@ public class PlaceViewActivity extends ListActivity implements LocationListener 
 	protected void onPause() {
 
 		// TODO - unregister for location updates
-
-        
+		mLocationManager.removeUpdates(this);
         
 		shutdownMockLocationManager();
 		super.onPause();
