@@ -38,6 +38,8 @@ public class PlaceViewActivity extends ListActivity implements LocationListener 
 
 	// A fake location provider used for testing
 	private MockLocationProvider mMockLocationProvider;
+	
+	private View footerView = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +54,8 @@ public class PlaceViewActivity extends ListActivity implements LocationListener 
 		// TODO - add a footerView to the ListView
 		// You can use footer_view.xml to define the footer
 
-        final View footerView = (TextView) getLayoutInflater().inflate(R.layout.footer_view, null);
-        footerView.setEnabled(null !=mLastLocationReading);
+        footerView = (TextView) getLayoutInflater().inflate(R.layout.footer_view, null);
+        //footerView.setEnabled(null !=mLastLocationReading);
 
 		// TODO - footerView must respond to user clicks, handling 3 cases:
 
@@ -75,9 +77,9 @@ public class PlaceViewActivity extends ListActivity implements LocationListener 
 
 			@Override
 			public void onClick(View arg0) {
-				mLastLocationReading = bestLastKnownLocation(mMinDistance, mMinTime);
+				mLastLocationReading = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 				if (null == mLastLocationReading) {
-					footerView.setEnabled(false);
+					//footerView.setEnabled(false);
 				} else {
 					if (!mAdapter.intersects(mLastLocationReading)) {
 						PlaceDownloaderTask placeDownloaderTask = new PlaceDownloaderTask(PlaceViewActivity.this, false);
@@ -95,42 +97,6 @@ public class PlaceViewActivity extends ListActivity implements LocationListener 
 		setListAdapter(mAdapter);
 
 	}
-	
-	private Location bestLastKnownLocation(float minAccuracy, long maxAge) {
-
-		Location bestResult = null;
-		float bestAccuracy = Float.MAX_VALUE;
-		long bestAge = Long.MIN_VALUE;
-
-		List<String> matchingProviders = mLocationManager.getAllProviders();
-
-		for (String provider : matchingProviders) {
-
-			Location location = mLocationManager.getLastKnownLocation(provider);
-
-			if (location != null) {
-
-				float accuracy = location.getAccuracy();
-				long time = location.getTime();
-
-				if (accuracy < bestAccuracy) {
-
-					bestResult = location;
-					bestAccuracy = accuracy;
-					bestAge = time;
-
-				}
-			}
-		}
-
-		// Return best reading or null
-		if (bestAccuracy > minAccuracy
-				|| (System.currentTimeMillis() - bestAge) > maxAge) {
-			return null;
-		} else {
-			return bestResult;
-		}
-	}
 
 	@Override
 	protected void onResume() {
@@ -141,6 +107,11 @@ public class PlaceViewActivity extends ListActivity implements LocationListener 
 		// TODO - Check NETWORK_PROVIDER for an existing location reading.
 		// Only keep this last reading if it is fresh - less than 5 minutes old
 		mLastLocationReading = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+		if(null != mLastLocationReading) {
+			if (ageInMilliseconds(mLastLocationReading) > FIVE_MINS) {
+				mLastLocationReading = null;
+			}
+		}
 		
 		// TODO - register to receive location updates from NETWORK_PROVIDER
 		mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, mMinTime, mMinDistance, this);
@@ -177,23 +148,16 @@ public class PlaceViewActivity extends ListActivity implements LocationListener 
 		
 		// Otherwise - add the PlaceBadge to the adapter
 		
-
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+		if (place.getPlace() != null) {
+            if (place.getCountryName() == null || place.getCountryName() == ""){
+                Toast.makeText(getApplicationContext(), getString(R.string.no_country_string), Toast.LENGTH_LONG).show();
+            } else {
+                mAdapter.add(place);
+                //footerView.setEnabled(true);
+            }
+        } else {
+			Toast.makeText(getApplicationContext(), "PlaceBadge could not be acquired" , Toast.LENGTH_LONG).show();
+		}
 	}
 
 	// LocationListener methods
@@ -207,14 +171,12 @@ public class PlaceViewActivity extends ListActivity implements LocationListener 
 		// the current location
 		// 3) If the current location is newer than the last locations, keep the
 		// current location.
-
-        
-        
-        
-        
-        
-        
+		if 	(mLastLocationReading == null || ageInMilliseconds(currentLocation) - ageInMilliseconds(mLastLocationReading) < 0) {
+			mLastLocationReading = currentLocation;
+			//footerView.setEnabled(true);
+		}
 			mLastLocationReading = null;
+			//footerView.setEnabled(false);
 	}
 
 	@Override
