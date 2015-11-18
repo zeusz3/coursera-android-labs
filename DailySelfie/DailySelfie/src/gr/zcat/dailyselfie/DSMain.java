@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 import android.app.ListActivity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -22,11 +21,14 @@ public class DSMain extends ListActivity {
 	static final int REQUEST_TAKE_PHOTO = 1;
 	static final int REQUEST_IMAGE_CAPTURE = 1;
 	private String mCurrentPhotoPath;
+	private PhotoViewAdapter mAdapter;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		//setContentView(R.layout.activity_dsmain);
+		mAdapter = new PhotoViewAdapter(getApplicationContext());
+		setListAdapter(mAdapter);
 	}
 
 	@Override
@@ -53,17 +55,18 @@ public class DSMain extends ListActivity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 	    ImageView mImageView = null;
 		if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
-	        Bundle extras = data.getExtras();
-	        Bitmap imageBitmap = (Bitmap) extras.get("data");
-	        mImageView.setImageBitmap(imageBitmap);
-	        getListView().addView(mImageView);
+	        //Bundle extras = data.getExtras();
+	        //Bitmap imageBitmap = (Bitmap) extras.get("data");
+	        //mImageView.setImageBitmap(imageBitmap);
+	        //getListView().addView(mImageView);
+			mAdapter.add(new PhotoRecord(mCurrentPhotoPath, mCurrentPhotoPath, mCurrentPhotoPath));
 	    }
 	}
 	
 	private File createImageFile() throws IOException {
 	    // Create an image file name
 	    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-	    String imageFileName = "JPEG_" + timeStamp + "_";
+	    String imageFileName = "DS_" + timeStamp;
 	    File storageDir = Environment.getExternalStoragePublicDirectory(
 	            Environment.DIRECTORY_PICTURES);
 	    File image = File.createTempFile(
