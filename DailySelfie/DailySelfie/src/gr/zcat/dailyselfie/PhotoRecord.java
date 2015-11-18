@@ -4,73 +4,35 @@ import android.graphics.Bitmap;
 import android.location.Location;
 
 public class PhotoRecord {
-	private String mFlagUrl;
-	private String mCountryName;
-	private String mPlaceName;
-	private Bitmap mFlagBitmap;
-	private Location mLocation;
+	private String fileName;
+	private Bitmap photoBitmap;
 
-	public PhotoRecord(String flagUrl, String country, String place) {
-		this.mFlagUrl = flagUrl;
-		this.mCountryName = country;
-		this.mPlaceName = place;
-	}
-
-	public PhotoRecord(Location location) {
-		mLocation = location;
+	public PhotoRecord(String fileName) {
+		this.fileName = fileName;
 	}
 
 	public PhotoRecord() {	
 	}
 	
-	public String getFlagUrl() {
-		return mFlagUrl;
+	public String getFileName() {
+		return fileName;
 	}
 
-	public void setFlagUrl(String flagUrl) {
-		this.mFlagUrl = flagUrl;
-	}
-
-	public String getCountryName() {
-		return mCountryName;
-	}
-
-	public void setCountryName(String country) {
-		this.mCountryName = country;
-	}
-
-	public String getPlace() {
-		return mPlaceName;
-	}
-
-	public void setPlace(String place) {
-		this.mPlaceName = place;
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
 	}
 
 	public Bitmap getFlagBitmap() {
-		return mFlagBitmap;
+		return photoBitmap;
 	}
 
-	public void setFlagBitmap(Bitmap mFlagBitmap) {
-		this.mFlagBitmap = mFlagBitmap;
-	}
-
-	public void setLocation(Location location) {
-		mLocation = location;
-	}
-
-	public Location getLocation() {
-		return mLocation;
-	}
-	
-	boolean intersects(Location location) {
-		double tolerance = 1000;
-		return (mLocation.distanceTo(location) <= tolerance);
+	public void setFlagBitmap(Bitmap photoBitmap) {
+		this.photoBitmap = photoBitmap;
 	}
 
 	@Override
 	public String toString(){
-		return "Place: " + mPlaceName + " Country: " + mCountryName;
+		return fileName;
 		
 	}
 }

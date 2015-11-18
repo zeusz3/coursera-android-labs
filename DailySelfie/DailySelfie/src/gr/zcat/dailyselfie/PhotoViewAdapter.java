@@ -26,7 +26,7 @@ public class PhotoViewAdapter extends BaseAdapter {
 		return list.size();
 	}
 
-	public Object getItem(int position) {
+	public PhotoRecord getItem(int position) {
 		return list.get(position);
 	}
 
@@ -45,37 +45,27 @@ public class PhotoViewAdapter extends BaseAdapter {
 			holder = new ViewHolder();
 			newView = inflater
 					.inflate(R.layout.photo_view, parent, false);
-			holder.flag = (ImageView) newView.findViewById(R.id.flag);
-			holder.country = (TextView) newView.findViewById(R.id.country_name);
-			holder.place = (TextView) newView.findViewById(R.id.place_name);
+			holder.photo = (ImageView) newView.findViewById(R.id.photo);
+			holder.fileName = (TextView) newView.findViewById(R.id.fileName);
 			newView.setTag(holder);
 
 		} else {
 			holder = (ViewHolder) newView.getTag();
 		}
 
-		holder.flag.setImageBitmap(curr.getFlagBitmap());
-		holder.country.setText("Country: " + curr.getCountryName());
-		holder.place.setText("Place: " + curr.getPlace());
+		holder.photo.setImageBitmap(curr.getFlagBitmap());
+		holder.fileName.setText("File: " + curr.getFileName());
 
 		return newView;
 	}
 
 	static class ViewHolder {
-
-		ImageView flag;
-		TextView country;
-		TextView place;
-
-	}
-
-	public boolean intersects(Location location) {
-		for (PhotoRecord item : list) {
-			if (item.intersects(location)) {
-				return true;
-			}
+		ImageView photo;
+		TextView fileName;
+		
+		public String getText() {
+			return fileName.getText().toString();
 		}
-		return false;
 	}
 
 	public void add(PhotoRecord listItem) {
